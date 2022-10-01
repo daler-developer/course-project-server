@@ -1,9 +1,27 @@
-import { Module } from '@nestjs/common';
+import { Module, NestModule, MiddlewareConsumer, Global } from '@nestjs/common';
 import { AuthModule } from './auth/auth.module';
+import { MongooseModule } from '@nestjs/mongoose';
+import { PopulateUserMiddleware } from './core/populate-user.middleware';
+import { RequestService } from './core/request.service';
+import { UsersModule } from './users/users.module';
+import { CollectionsModule } from './collections/collections.module';
 
+@Global()
 @Module({
-  imports: [AuthModule],
+  imports: [
+    AuthModule,
+    UsersModule,
+    CollectionsModule,
+    MongooseModule.forRoot(
+      'mongodb+srv://daler-developer:2000909k@cluster0.w93fir2.mongodb.net/?retryWrites=true&w=majority',
+    ),
+  ],
   controllers: [],
-  providers: [],
+  providers: [RequestService],
+  exports: [RequestService],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(PopulateUserMiddleware).forRoutes('*');
+  }
+}
