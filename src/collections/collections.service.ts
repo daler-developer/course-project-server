@@ -12,19 +12,41 @@ export class CollectionsService {
     @InjectModel('collection') private CollectionModel: Model<ICollection>,
   ) {}
 
+  async getUserCollections({
+    userId,
+    offset,
+  }: {
+    userId: Types.ObjectId;
+    offset: number;
+  }) {
+    const collections = await this.CollectionModel.find({
+      creatorId: userId,
+    })
+      .skip(offset)
+      .limit(10);
+
+    return collections;
+  }
+
   async createCollectionAndReturn({
     desc,
     fields,
     imageUrl,
     name,
+    creatorId,
     topic,
-  }: CreateCollectionDto & { imageUrl: string }) {
+  }: CreateCollectionDto & { imageUrl: string; creatorId: Types.ObjectId }) {
     const collection = await this.CollectionModel.create({
       desc,
       fields,
       imageUrl,
       name,
       topic,
+      creatorId,
+    });
+
+    collection.populate({
+      path: 'creatorId',
     });
 
     return collection;
@@ -38,5 +60,22 @@ export class CollectionsService {
     }
 
     return collection;
+  }
+
+  async checkIfUserIsCreatorOfCollection({
+    collectionId,
+    userId,
+  }: {
+    collectionId: Types.ObjectId;
+    userId: Types.ObjectId;
+  }) {
+    return !!(await this.CollectionModel.findOne({
+      creatorId: userId,
+      _id: collectionId,
+    }));
+  }
+
+  async deleteCollection(collectionId: Types.ObjectId) {
+    await this.CollectionModel.deleteOne({ _id: collectionId });
   }
 }

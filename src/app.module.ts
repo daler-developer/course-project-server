@@ -5,6 +5,7 @@ import { PopulateUserMiddleware } from './core/populate-user.middleware';
 import { RequestService } from './core/request.service';
 import { UsersModule } from './users/users.module';
 import { CollectionsModule } from './collections/collections.module';
+import { ItemsModule } from './items/items.module';
 
 @Global()
 @Module({
@@ -12,6 +13,7 @@ import { CollectionsModule } from './collections/collections.module';
     AuthModule,
     UsersModule,
     CollectionsModule,
+    ItemsModule,
     MongooseModule.forRoot(
       'mongodb+srv://daler-developer:2000909k@cluster0.w93fir2.mongodb.net/?retryWrites=true&w=majority',
     ),

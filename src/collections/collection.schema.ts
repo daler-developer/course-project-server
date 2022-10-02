@@ -6,6 +6,7 @@ export interface ICollection {
   desc: string;
   topic: string;
   imageUrl?: string;
+  creatorId: mongoose.Types.ObjectId;
   fields: {
     boolean: string[];
     integer: string[];
@@ -19,6 +20,10 @@ export const CollectionSchema = new mongoose.Schema<ICollection>(
   {
     name: {
       type: String,
+      required: true,
+    },
+    creatorId: {
+      type: mongoose.Schema.Types.ObjectId,
       required: true,
     },
     desc: {
