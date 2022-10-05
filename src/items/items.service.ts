@@ -15,14 +15,10 @@ export class ItemsService {
 
   async createItemAndReturn({
     fields,
-    name,
-    tags,
     collectionId,
   }: CreateItemDto & { collectionId: Types.ObjectId }) {
     const item = await this.ItemModel.create({
-      name,
       fields,
-      tags,
       collectionId,
     });
 

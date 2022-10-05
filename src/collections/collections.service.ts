@@ -56,6 +56,8 @@ export class CollectionsService {
   async getCollectionByIdOrFailIfNotFound(_id: Types.ObjectId) {
     const collection = await this.CollectionModel.findById(_id);
 
+    console.log(collection as any);
+
     if (!collection) {
       throw new CollectionNotFoundError();
     }

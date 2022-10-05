@@ -11,7 +11,7 @@ export interface ICollection {
     boolean: string[];
     integer: string[];
     text: string[];
-    multitext: string[];
+    multiLineText: string[];
     date: string[];
   };
 }
@@ -55,7 +55,7 @@ export const CollectionSchema = new mongoose.Schema<ICollection>(
           required: true,
           default: () => [],
         },
-        multitext: {
+        multiLineText: {
           type: [String],
           required: true,
           default: () => [],

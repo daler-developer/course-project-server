@@ -31,7 +31,7 @@ export class ItemsController {
     @User() user: IUser,
   ) {
     const isForbiddenToCreateItem =
-      !user.isAdmin ||
+      !user.isAdmin &&
       (await this.collectionsService.checkIfUserIsCreatorOfCollection({
         collectionId,
         userId: user._id,

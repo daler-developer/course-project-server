@@ -8,14 +8,6 @@ import {
 } from 'class-validator';
 
 export class CreateItemDto {
-  @IsString()
-  @MinLength(1)
-  @MaxLength(100)
-  name: string;
-
-  @IsArray()
-  tags: string[];
-
   @IsObject()
   fields: object;
 }

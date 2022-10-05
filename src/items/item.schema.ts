@@ -12,15 +12,6 @@ export interface IItem {
 
 export const ItemSchema = new mongoose.Schema<IItem>(
   {
-    name: {
-      type: String,
-      required: true,
-    },
-    tags: {
-      type: [String],
-      required: true,
-      default: () => [],
-    },
     fields: {
       type: Object,
       required: true,
