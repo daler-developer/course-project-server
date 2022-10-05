@@ -16,12 +16,6 @@ export class AuthController {
     private requestService: RequestService,
   ) {}
 
-  @Get('/auth/me')
-  @UseGuards(AuthRequiredGuard)
-  async getMe() {
-    return { user: this.requestService.currentUser };
-  }
-
   @Post('/auth/register')
   async register(@Body(ValidationPipe) body: CreateUserDto) {
     const alreadyExists = await this.usersService.userWithUsernameExists(

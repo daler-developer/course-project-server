@@ -22,6 +22,7 @@ export class CollectionsService {
     const collections = await this.CollectionModel.find({
       creatorId: userId,
     })
+      .populate('creator')
       .skip(offset)
       .limit(10);
 

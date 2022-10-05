@@ -16,10 +16,17 @@ import { GetUsersDto } from './dto/get-users-query';
 import { UsersService } from './users.service';
 import { UserByIdPipe } from 'src/core/pipes/user-by-id.pipe';
 import { IUser } from './user.schema';
+import { User } from 'src/core/decorators/user.decorator';
 
 @Controller('/api')
 export class UsersController {
   constructor(private usersService: UsersService) {}
+
+  @Get('/users/me')
+  @UseGuards(AuthRequiredGuard)
+  async getMe(@User() user: IUser) {
+    return { user };
+  }
 
   @Get('/admin/users')
   @UseGuards(AuthRequiredGuard, AdminRequiredGuard)

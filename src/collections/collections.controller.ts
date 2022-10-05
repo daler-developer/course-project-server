@@ -93,7 +93,7 @@ export class CollectionsController {
     @Param('_id', ParseObjectIdPipe) collectionId: Types.ObjectId,
   ) {
     const forbiddenToDelete =
-      !user.isAdmin ||
+      !user.isAdmin &&
       (await this.collectionsService.checkIfUserIsCreatorOfCollection({
         userId: user._id,
         collectionId,

@@ -35,7 +35,7 @@ export class PopulateUserMiddleware implements NestMiddleware {
 
       return next();
     } catch (e) {
-      throw new NotAuthenticatedError();
+      return next();
     }
   }
 }

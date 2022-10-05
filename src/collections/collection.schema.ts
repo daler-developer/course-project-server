@@ -34,6 +34,10 @@ export const CollectionSchema = new mongoose.Schema<ICollection>(
       type: String,
       required: false,
     },
+    topic: {
+      type: String,
+      required: false,
+    },
     fields: {
       type: {
         boolean: {
@@ -66,5 +70,16 @@ export const CollectionSchema = new mongoose.Schema<ICollection>(
       default: () => ({}),
     },
   },
-  { versionKey: false },
+  {
+    versionKey: false,
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true },
+  },
 );
+
+CollectionSchema.virtual('creator', {
+  ref: 'user',
+  localField: 'creatorId',
+  foreignField: '_id',
+  justOne: true,
+});

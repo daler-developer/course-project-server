@@ -29,5 +29,9 @@ export const UserSchema = new mongoose.Schema<IUser>(
       default: () => false,
     },
   },
-  { versionKey: false },
+  {
+    versionKey: false,
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true },
+  },
 );
