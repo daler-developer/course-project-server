@@ -1,17 +1,24 @@
 import {
   Body,
   Controller,
+  Delete,
+  Get,
   Param,
   Patch,
   Post,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import { Types } from 'mongoose';
 import { CollectionsService } from 'src/collections/collections.service';
 import { User } from 'src/core/decorators/user.decorator';
-import { ForbiddenToCreateItemError } from 'src/core/errors/items';
+import {
+  ForbiddenToCreateItemError,
+  ForbiddenToDeleteItemError,
+} from 'src/core/errors/items';
 import { AuthRequiredGuard } from 'src/core/guards/auth-required.guard';
 import { ParseObjectIdPipe } from 'src/core/pipes/parse-object-id.pipe';
+import { ParseOffsetPipe } from 'src/core/pipes/parse-offet.pipe';
 import { IUser } from 'src/users/user.schema';
 import { CreateItemDto } from './dto/create-item.dto';
 import { ItemsService } from './items.service';
@@ -44,7 +51,28 @@ export class ItemsController {
     const item = await this.itemsService.createItemAndReturn({
       ...body,
       collectionId,
+      creatorId: user._id,
     });
+
+    return { item };
+  }
+
+  @Get('/collections/:collectionId/items')
+  async getItems(
+    @Query('offset', ParseOffsetPipe) offset: number,
+    @Param('collectionId', ParseObjectIdPipe) collectionId: Types.ObjectId,
+  ) {
+    const items = await this.itemsService.getCollectionItems({
+      offset,
+      collectionId,
+    });
+
+    return { items };
+  }
+
+  @Get('/items/:_id')
+  async getItem(@Param('_id', ParseObjectIdPipe) itemId: Types.ObjectId) {
+    const item = await this.itemsService.getItemByIdOrFailIfNotFound(itemId);
 
     return { item };
   }
@@ -55,5 +83,35 @@ export class ItemsController {
     await this.itemsService.likeItemOrFailIfAlreadyLiked(itemId);
 
     return { liked: true };
+  }
+
+  @Patch('/items/:itemId/unlike')
+  @UseGuards(AuthRequiredGuard)
+  async unlikeItem(@Param('itemId', ParseObjectIdPipe) itemId: Types.ObjectId) {
+    await this.itemsService.unlikeItemOrFailIfNotLikedYet(itemId);
+
+    return { unliked: true };
+  }
+
+  @Delete('/items/:itemId')
+  @UseGuards(AuthRequiredGuard)
+  async deleteItem(
+    @Param('itemId', ParseObjectIdPipe) itemId: Types.ObjectId,
+    @User() user: IUser,
+  ) {
+    const forbiddenToDelete =
+      !user.isAdmin &&
+      !(await this.itemsService.checkIfItemIsCreatedByUser({
+        itemId,
+        creatorId: user._id,
+      }));
+
+    if (forbiddenToDelete) {
+      throw new ForbiddenToDeleteItemError();
+    }
+
+    await this.itemsService.deleteItem({ itemId });
+
+    return { unliked: true };
   }
 }

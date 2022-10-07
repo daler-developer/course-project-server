@@ -86,6 +86,20 @@ export class CollectionsController {
     return { collections };
   }
 
+  @Get('/largest/collections')
+  @UseGuards(AuthRequiredGuard)
+  async getLargestCollections(
+    @Query('offset', ParseOffsetPipe) offset: number,
+    @User() currentUser: IUser,
+  ) {
+    const collections = await this.collectionsService.getUserCollections({
+      userId: currentUser._id,
+      offset,
+    });
+
+    return { collections };
+  }
+
   @Delete('/collections/:_id')
   @UseGuards(AuthRequiredGuard)
   async deleteCollection(

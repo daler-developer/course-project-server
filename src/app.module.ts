@@ -6,6 +6,7 @@ import { RequestService } from './core/request.service';
 import { UsersModule } from './users/users.module';
 import { CollectionsModule } from './collections/collections.module';
 import { ItemsModule } from './items/items.module';
+import { CommentsModule } from './comments/comments.module';
 
 @Global()
 @Module({
@@ -14,6 +15,7 @@ import { ItemsModule } from './items/items.module';
     UsersModule,
     CollectionsModule,
     ItemsModule,
+    CommentsModule,
     MongooseModule.forRoot(
       'mongodb+srv://daler-developer:2000909k@cluster0.w93fir2.mongodb.net/?retryWrites=true&w=majority',
     ),
