@@ -41,8 +41,10 @@ export class CollectionsController {
     @UploadedFile() file: any,
     @Body(ValidationPipe) body: CreateCollectionDto,
   ) {
-    const { url: imageUrl }: { url: string } = await new Promise(
-      (resolve, reject) => {
+    let imageUrl: string | undefined;
+
+    if (file) {
+      const result = await new Promise((resolve, reject) => {
         const upload = cloundinary.v2.uploader.upload_stream(
           (error, result) => {
             if (error) return reject(error);
@@ -51,8 +53,10 @@ export class CollectionsController {
         );
 
         toStream(file.buffer).pipe(upload);
-      },
-    );
+      });
+
+      imageUrl = (result as { url: string }).url;
+    }
 
     const collection = await this.collectionsService.createCollectionAndReturn({
       ...body,
@@ -61,6 +65,13 @@ export class CollectionsController {
     });
 
     return { collection };
+  }
+
+  @Get('/collections/largest')
+  async getLargestCollections() {
+    const collections = await this.collectionsService.getLargestCollections();
+
+    return { collections };
   }
 
   @Get('/collections/:_id')
@@ -86,20 +97,6 @@ export class CollectionsController {
     return { collections };
   }
 
-  @Get('/largest/collections')
-  @UseGuards(AuthRequiredGuard)
-  async getLargestCollections(
-    @Query('offset', ParseOffsetPipe) offset: number,
-    @User() currentUser: IUser,
-  ) {
-    const collections = await this.collectionsService.getUserCollections({
-      userId: currentUser._id,
-      offset,
-    });
-
-    return { collections };
-  }
-
   @Delete('/collections/:_id')
   @UseGuards(AuthRequiredGuard)
   async deleteCollection(
@@ -108,7 +105,7 @@ export class CollectionsController {
   ) {
     const forbiddenToDelete =
       !user.isAdmin &&
-      (await this.collectionsService.checkIfUserIsCreatorOfCollection({
+      !(await this.collectionsService.checkIfUserIsCreatorOfCollection({
         userId: user._id,
         collectionId,
       }));

@@ -7,6 +7,7 @@ export interface ICollection {
   topic: string;
   imageUrl?: string;
   creatorId: mongoose.Types.ObjectId;
+  numItems: number;
   fields: {
     boolean: string[];
     integer: string[];
@@ -29,6 +30,11 @@ export const CollectionSchema = new mongoose.Schema<ICollection>(
     desc: {
       type: String,
       required: true,
+    },
+    numItems: {
+      type: Number,
+      required: true,
+      default: () => 0,
     },
     imageUrl: {
       type: String,

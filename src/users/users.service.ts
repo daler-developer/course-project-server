@@ -12,6 +12,26 @@ import { CreateUserDto } from './dto/create-user.dto';
 export class UsersService {
   constructor(@InjectModel('user') private UserModel: Model<IUser>) {}
 
+  async changeThemeOfUser({
+    userId,
+    to,
+  }: {
+    userId: Types.ObjectId;
+    to: 'light' | 'dark';
+  }) {
+    await this.UserModel.updateOne({ _id: userId }, { $set: { theme: to } });
+  }
+
+  async changeLangOfUser({
+    userId,
+    to,
+  }: {
+    userId: Types.ObjectId;
+    to: 'ru' | 'en';
+  }) {
+    await this.UserModel.updateOne({ _id: userId }, { $set: { theme: to } });
+  }
+
   async userWithUsernameExists(username: string) {
     return await this.UserModel.exists({ username });
   }

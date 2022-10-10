@@ -4,11 +4,12 @@ export interface IItem {
   _id: mongoose.Types.ObjectId;
   collectionId: mongoose.Types.ObjectId;
   name: string;
-  tags: string[];
   fields: object;
+  tags: string[];
   likes_ids: mongoose.Types.ObjectId[];
   comments_ids: mongoose.Types.ObjectId[];
   creatorId: mongoose.Types.ObjectId;
+  createdAt: Date;
 }
 
 export const ItemSchema = new mongoose.Schema<IItem>(
@@ -22,7 +23,37 @@ export const ItemSchema = new mongoose.Schema<IItem>(
       required: true,
     },
     fields: {
-      type: Object,
+      type: {
+        text: {
+          type: Object,
+          required: true,
+          default: () => ({}),
+        },
+        multiLineText: {
+          type: Object,
+          required: true,
+          default: () => ({}),
+        },
+        integer: {
+          type: Object,
+          required: true,
+          default: () => ({}),
+        },
+        boolean: {
+          type: Object,
+          required: true,
+          default: () => ({}),
+        },
+        date: {
+          type: Object,
+          required: true,
+          default: () => ({}),
+        },
+      },
+      required: true,
+    },
+    name: {
+      type: String,
       required: true,
     },
     likes_ids: {
@@ -35,13 +66,33 @@ export const ItemSchema = new mongoose.Schema<IItem>(
       required: true,
       default: () => [],
     },
+    tags: {
+      type: [String],
+      required: true,
+      default: () => [],
+    },
+    createdAt: {
+      type: Date,
+      required: true,
+      default: () => new Date(),
+    },
   },
-  { versionKey: false },
+  {
+    versionKey: false,
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true },
+  },
 );
 
 ItemSchema.virtual('creator', {
   ref: 'user',
   localField: 'creatorId',
+  foreignField: '_id',
+  justOne: true,
+});
+ItemSchema.virtual('_collection', {
+  ref: 'collection',
+  localField: 'collectionId',
   foreignField: '_id',
   justOne: true,
 });

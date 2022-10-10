@@ -39,7 +39,7 @@ export class ItemsController {
   ) {
     const isForbiddenToCreateItem =
       !user.isAdmin &&
-      (await this.collectionsService.checkIfUserIsCreatorOfCollection({
+      !(await this.collectionsService.checkIfUserIsCreatorOfCollection({
         collectionId,
         userId: user._id,
       }));
@@ -66,6 +66,13 @@ export class ItemsController {
       offset,
       collectionId,
     });
+
+    return { items };
+  }
+
+  @Get('/items/latest')
+  async getLatestItems() {
+    const items = await this.itemsService.getLatestItems();
 
     return { items };
   }

@@ -7,6 +7,7 @@ import { UsersModule } from './users/users.module';
 import { CollectionsModule } from './collections/collections.module';
 import { ItemsModule } from './items/items.module';
 import { CommentsModule } from './comments/comments.module';
+import { TagsModule } from './tags/tags.module';
 
 @Global()
 @Module({
@@ -16,6 +17,7 @@ import { CommentsModule } from './comments/comments.module';
     CollectionsModule,
     ItemsModule,
     CommentsModule,
+    TagsModule,
     MongooseModule.forRoot(
       'mongodb+srv://daler-developer:2000909k@cluster0.w93fir2.mongodb.net/?retryWrites=true&w=majority',
     ),

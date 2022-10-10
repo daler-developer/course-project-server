@@ -15,6 +15,8 @@ export class CommentsService {
   }: CreateCommentDto & { creatorId: Types.ObjectId; itemId: Types.ObjectId }) {
     const comment = await this.CommentModel.create({ creatorId, text, itemId });
 
+    await comment.populate('creator');
+
     return comment;
   }
 
@@ -30,8 +32,6 @@ export class CommentsService {
       .sort('-createdAt')
       .skip(offset)
       .limit(10);
-
-    console.log(comments);
 
     return comments;
   }

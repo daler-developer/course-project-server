@@ -29,6 +29,14 @@ export class CollectionsService {
     return collections;
   }
 
+  async getLargestCollections() {
+    const collections = await this.CollectionModel.find()
+      .sort('-numItems')
+      .limit(5);
+
+    return collections;
+  }
+
   async createCollectionAndReturn({
     desc,
     fields,
@@ -53,10 +61,24 @@ export class CollectionsService {
     return collection;
   }
 
-  async getCollectionByIdOrFailIfNotFound(_id: Types.ObjectId) {
-    const collection = await this.CollectionModel.findById(_id);
+  async incrementNumItemsInCollection({
+    collectionId,
+  }: {
+    collectionId: Types.ObjectId;
+  }) {
+    await this.CollectionModel.updateOne(
+      { _id: collectionId },
+      {
+        $inc: {
+          numItems: 1,
+        },
+      },
+    );
+  }
 
-    console.log(collection as any);
+  async getCollectionByIdOrFailIfNotFound(_id: Types.ObjectId) {
+    const collection = await this.CollectionModel.findById(_id)
+    
 
     if (!collection) {
       throw new CollectionNotFoundError();

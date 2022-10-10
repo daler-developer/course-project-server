@@ -5,6 +5,8 @@ export interface IUser {
   username: string;
   password: string;
   isAdmin: boolean;
+  theme: 'light' | 'dark';
+  lang: 'ru' | 'en';
   isBlocked: boolean;
 }
 
@@ -17,6 +19,16 @@ export const UserSchema = new mongoose.Schema<IUser>(
     password: {
       type: String,
       required: true,
+    },
+    theme: {
+      type: String,
+      required: true,
+      default: () => 'light',
+    },
+    lang: {
+      type: String,
+      required: true,
+      default: () => 'ru',
     },
     isAdmin: {
       type: Boolean,

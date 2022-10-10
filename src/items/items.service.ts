@@ -1,12 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
+import { CollectionsService } from 'src/collections/collections.service';
 import {
   AlreadyLikedItemError,
   DidNotLikedItemError,
   ItemNotFoundError,
 } from 'src/core/errors/items';
 import { RequestService } from 'src/core/request.service';
+import { TagsService } from 'src/tags/tags.service';
 import { CreateItemDto } from './dto/create-item.dto';
 import { IItem } from './item.schema';
 
@@ -14,13 +16,27 @@ import { IItem } from './item.schema';
 export class ItemsService {
   constructor(
     @InjectModel('item') private ItemModel: Model<IItem>,
+    private collectionsService: CollectionsService,
     private requestService: RequestService,
+    private tagsService: TagsService,
   ) {}
+
+  async getLatestItems() {
+    const items = await this.ItemModel.find()
+      .sort('-createdAt')
+      .populate('creator')
+      .populate('_collection')
+      .limit(5);
+
+    return items;
+  }
 
   async createItemAndReturn({
     fields,
+    tags,
     collectionId,
     creatorId,
+    name,
   }: CreateItemDto & {
     collectionId: Types.ObjectId;
     creatorId: Types.ObjectId;
@@ -29,6 +45,14 @@ export class ItemsService {
       fields,
       collectionId,
       creatorId,
+      name,
+      tags,
+    });
+
+    await this.tagsService.createTags(tags);
+
+    await this.collectionsService.incrementNumItemsInCollection({
+      collectionId,
     });
 
     return item;
@@ -39,7 +63,9 @@ export class ItemsService {
   }
 
   async getItemByIdOrFailIfNotFound(_id: Types.ObjectId) {
-    const item = await this.ItemModel.findById(_id);
+    const item = await this.ItemModel.findById(_id)
+      .populate('creator')
+      .populate('_collection');
 
     if (!item) {
       throw new ItemNotFoundError();
@@ -66,6 +92,8 @@ export class ItemsService {
     offset: number;
   }) {
     const items = await this.ItemModel.find({ collectionId })
+      .populate('creator')
+      .populate('_collection')
       .skip(offset)
       .limit(10);
 

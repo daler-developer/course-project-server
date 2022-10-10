@@ -8,25 +8,32 @@ export interface IComment {
   createdAt: Date;
 }
 
-export const CommentSchema = new mongoose.Schema<IComment>({
-  creatorId: {
-    type: mongoose.Schema.Types.ObjectId,
-    required: true,
+export const CommentSchema = new mongoose.Schema<IComment>(
+  {
+    creatorId: {
+      type: mongoose.Schema.Types.ObjectId,
+      required: true,
+    },
+    text: {
+      type: String,
+      required: true,
+    },
+    itemId: {
+      type: mongoose.Schema.Types.ObjectId,
+      required: true,
+    },
+    createdAt: {
+      type: Date,
+      required: true,
+      default: () => new Date(),
+    },
   },
-  text: {
-    type: String,
-    required: true,
+  {
+    versionKey: false,
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true },
   },
-  itemId: {
-    type: mongoose.Schema.Types.ObjectId,
-    required: true,
-  },
-  createdAt: {
-    type: Date,
-    required: true,
-    default: () => new Date(),
-  },
-});
+);
 
 CommentSchema.virtual('creator', {
   ref: 'user',
