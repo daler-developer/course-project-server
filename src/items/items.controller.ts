@@ -57,6 +57,17 @@ export class ItemsController {
     return { item };
   }
 
+  @Get('/items/search')
+  async searchItems(
+    @Query('offset', ParseOffsetPipe) offset: number,
+    @Query('tag') tag?: string,
+    @Query('search') search?: string,
+  ) {
+    const items = await this.itemsService.searchItems({ offset, tag, search });
+
+    return { items };
+  }
+
   @Get('/collections/:collectionId/items')
   async getItems(
     @Query('offset', ParseOffsetPipe) offset: number,

@@ -5,6 +5,13 @@ import { TagsService } from './tags.service';
 export class TagsController {
   constructor(private tagsService: TagsService) {}
 
+  @Get('/tags')
+  async getTags() {
+    const tags = await this.tagsService.getAllTags();
+
+    return { tags };
+  }
+
   @Get('/tags/search')
   async searchTags(@Query('search') search: string) {
     const tags = await this.tagsService.searchTags({ search });

@@ -31,6 +31,41 @@ export class ItemsService {
     return items;
   }
 
+  async searchItems({
+    offset,
+    search,
+    tag,
+  }: {
+    offset: number;
+    tag?: string;
+    search?: string;
+  }) {
+    const $or = [];
+
+    if (search) {
+      $or.push({
+        name: {
+          $regex: new RegExp(search, 'i'),
+        },
+      });
+    }
+
+    if (tag) {
+      $or.push({
+        tags: {
+          $all: [tag],
+        },
+      });
+    }
+    const items = await this.ItemModel.find({
+      $or,
+    })
+      .skip(offset)
+      .limit(10);
+
+    return items;
+  }
+
   async createItemAndReturn({
     fields,
     tags,

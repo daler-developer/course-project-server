@@ -7,6 +7,12 @@ import { ITag } from './tag.schema';
 export class TagsService {
   constructor(@InjectModel('tag') private TagModel: Model<ITag>) {}
 
+  async getAllTags() {
+    const tags = await this.TagModel.find();
+
+    return tags;
+  }
+
   async createTags(tags: string[]) {
     for (let tag of tags) {
       if (!(await this.TagModel.exists({ label: tag }))) {

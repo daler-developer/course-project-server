@@ -29,7 +29,7 @@ export class UsersService {
     userId: Types.ObjectId;
     to: 'ru' | 'en';
   }) {
-    await this.UserModel.updateOne({ _id: userId }, { $set: { theme: to } });
+    await this.UserModel.updateOne({ _id: userId }, { $set: { lang: to } });
   }
 
   async userWithUsernameExists(username: string) {
