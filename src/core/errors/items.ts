@@ -18,6 +18,12 @@ export class ForbiddenToDeleteItemError extends RequestError {
   }
 }
 
+export class ForbiddenToEditItemError extends RequestError {
+  constructor() {
+    super('Forbidden to edit item', 400);
+  }
+}
+
 export class AlreadyLikedItemError extends RequestError {
   constructor() {
     super('You already liked this item', 400);

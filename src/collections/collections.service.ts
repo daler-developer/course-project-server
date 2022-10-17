@@ -5,6 +5,7 @@ import { CollectionNotFoundError } from 'src/core/errors/collections';
 import { IUser } from 'src/users/user.schema';
 import { ICollection } from './collection.schema';
 import { CreateCollectionDto } from './dto/create-collection.dto';
+import { EditCollectionDto } from './dto/edit-collection.dto';
 
 @Injectable()
 export class CollectionsService {
@@ -61,6 +62,40 @@ export class CollectionsService {
     return collection;
   }
 
+  async editCollection({
+    collectionId,
+    desc,
+    fields,
+    imageUrl,
+    name,
+    topic,
+  }: EditCollectionDto & {
+    imageUrl: string;
+    collectionId: Types.ObjectId;
+  }) {
+    await this.CollectionModel.updateOne(
+      { _id: collectionId },
+      {
+        $set: {
+          desc,
+          fields,
+          name,
+          topic,
+          ...(imageUrl && { imageUrl }),
+        },
+        $unset: {
+          ...(!imageUrl && { imageUrl: 1 }),
+        },
+      },
+    );
+
+    const updatedCollection = await this.getCollectionByIdOrFailIfNotFound(
+      collectionId,
+    );
+
+    return updatedCollection;
+  }
+
   async incrementNumItemsInCollection({
     collectionId,
   }: {
@@ -77,8 +112,7 @@ export class CollectionsService {
   }
 
   async getCollectionByIdOrFailIfNotFound(_id: Types.ObjectId) {
-    const collection = await this.CollectionModel.findById(_id)
-    
+    const collection = await this.CollectionModel.findById(_id);
 
     if (!collection) {
       throw new CollectionNotFoundError();

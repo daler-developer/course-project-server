@@ -10,6 +10,7 @@ import {
 import { RequestService } from 'src/core/request.service';
 import { TagsService } from 'src/tags/tags.service';
 import { CreateItemDto } from './dto/create-item.dto';
+import { EditItemDto } from './dto/edit-item.dto';
 import { IItem } from './item.schema';
 
 @Injectable()
@@ -29,6 +30,19 @@ export class ItemsService {
       .limit(5);
 
     return items;
+  }
+
+  async editItem({
+    fields,
+    name,
+    tags,
+    _id,
+  }: EditItemDto & { _id: Types.ObjectId }) {
+    await this.ItemModel.updateOne({ _id }, { $set: { fields, name, tags } });
+
+    const updatedItem = await this.getItemByIdOrFailIfNotFound(_id);
+
+    return updatedItem;
   }
 
   async searchItems({

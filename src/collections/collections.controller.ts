@@ -9,6 +9,7 @@ import {
   Param,
   Query,
   Delete,
+  Patch,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { AuthRequiredGuard } from 'src/core/guards/auth-required.guard';
@@ -26,6 +27,7 @@ import { ParseOffsetPipe } from 'src/core/pipes/parse-offet.pipe';
 import { User } from 'src/core/decorators/user.decorator';
 import { IUser } from 'src/users/user.schema';
 import { ForbiddenToDeleteCollectionError } from 'src/core/errors/collections';
+import { EditCollectionDto } from './dto/edit-collection.dto';
 
 @Controller('/api')
 export class CollectionsController {
@@ -67,6 +69,40 @@ export class CollectionsController {
     return { collection };
   }
 
+  @Patch('/collections/:_id')
+  @UseGuards(AuthRequiredGuard)
+  @UseInterceptors(FileInterceptor('image'))
+  async editCollection(
+    @UploadedFile() file: any,
+    @Body(ValidationPipe) body: EditCollectionDto,
+    @Param('_id', ParseObjectIdPipe) collectionId: Types.ObjectId,
+  ) {
+    let imageUrl: string | undefined;
+
+    if (file) {
+      const result = await new Promise((resolve, reject) => {
+        const upload = cloundinary.v2.uploader.upload_stream(
+          (error, result) => {
+            if (error) return reject(error);
+            resolve(result);
+          },
+        );
+
+        toStream(file.buffer).pipe(upload);
+      });
+
+      imageUrl = (result as { url: string }).url;
+    }
+
+    const updatedCollection = await this.collectionsService.editCollection({
+      ...body,
+      imageUrl,
+      collectionId,
+    });
+
+    return { collection: updatedCollection };
+  }
+
   @Get('/collections/largest')
   async getLargestCollections() {
     const collections = await this.collectionsService.getLargestCollections();
@@ -75,7 +111,6 @@ export class CollectionsController {
   }
 
   @Get('/collections/:_id')
-  @UseGuards(AuthRequiredGuard)
   async getCollection(@Param('_id', ParseObjectIdPipe) _id: Types.ObjectId) {
     const collection =
       await this.collectionsService.getCollectionByIdOrFailIfNotFound(_id);

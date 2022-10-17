@@ -15,12 +15,15 @@ import { User } from 'src/core/decorators/user.decorator';
 import {
   ForbiddenToCreateItemError,
   ForbiddenToDeleteItemError,
+  ForbiddenToEditItemError,
 } from 'src/core/errors/items';
 import { AuthRequiredGuard } from 'src/core/guards/auth-required.guard';
 import { ParseObjectIdPipe } from 'src/core/pipes/parse-object-id.pipe';
 import { ParseOffsetPipe } from 'src/core/pipes/parse-offet.pipe';
+import { ValidationPipe } from 'src/core/pipes/validation.pipe';
 import { IUser } from 'src/users/user.schema';
 import { CreateItemDto } from './dto/create-item.dto';
+import { EditItemDto } from './dto/edit-item.dto';
 import { ItemsService } from './items.service';
 
 @Controller('/api')
@@ -31,7 +34,6 @@ export class ItemsController {
   ) {}
 
   @Post('/collections/:collectionId/items')
-  @UseGuards(AuthRequiredGuard)
   async createItem(
     @Body() body: CreateItemDto,
     @Param('collectionId', ParseObjectIdPipe) collectionId: Types.ObjectId,
@@ -93,6 +95,29 @@ export class ItemsController {
     const item = await this.itemsService.getItemByIdOrFailIfNotFound(itemId);
 
     return { item };
+  }
+
+  @Patch('/items/:_id')
+  @UseGuards(AuthRequiredGuard)
+  async editItem(
+    @Body(ValidationPipe) body: EditItemDto,
+    @Param('_id', ParseObjectIdPipe) _id: Types.ObjectId,
+    @User() user: IUser,
+  ) {
+    const isForbiddenToEdit =
+      !user.isAdmin &&
+      !(await this.itemsService.checkIfItemIsCreatedByUser({
+        creatorId: user._id,
+        itemId: _id,
+      }));
+
+    if (isForbiddenToEdit) {
+      throw new ForbiddenToEditItemError();
+    }
+
+    const updatedItem = await this.itemsService.editItem({ ...body, _id });
+
+    return { item: updatedItem };
   }
 
   @Patch('/items/:itemId/like')
