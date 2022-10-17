@@ -80,6 +80,10 @@ export class ItemsService {
     return items;
   }
 
+  async deleteItemsWithCollectionId(collectionId: Types.ObjectId) {
+    await this.ItemModel.deleteMany({ collectionId });
+  }
+
   async createItemAndReturn({
     fields,
     tags,

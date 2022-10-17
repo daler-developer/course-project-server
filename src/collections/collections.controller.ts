@@ -57,7 +57,7 @@ export class CollectionsController {
         toStream(file.buffer).pipe(upload);
       });
 
-      imageUrl = (result as { url: string }).url;
+      imageUrl = (result as { secure_url: string }).secure_url;
     }
 
     const collection = await this.collectionsService.createCollectionAndReturn({
@@ -91,7 +91,7 @@ export class CollectionsController {
         toStream(file.buffer).pipe(upload);
       });
 
-      imageUrl = (result as { url: string }).url;
+      imageUrl = (result as { secure_url: string }).secure_url;
     }
 
     const updatedCollection = await this.collectionsService.editCollection({

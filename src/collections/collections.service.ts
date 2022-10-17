@@ -2,7 +2,10 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { CollectionNotFoundError } from 'src/core/errors/collections';
+import { IItem } from 'src/items/item.schema';
+import { ItemsService } from 'src/items/items.service';
 import { IUser } from 'src/users/user.schema';
+import { UsersService } from 'src/users/users.service';
 import { ICollection } from './collection.schema';
 import { CreateCollectionDto } from './dto/create-collection.dto';
 import { EditCollectionDto } from './dto/edit-collection.dto';
@@ -11,7 +14,8 @@ import { EditCollectionDto } from './dto/edit-collection.dto';
 export class CollectionsService {
   constructor(
     @InjectModel('collection') private CollectionModel: Model<ICollection>,
-  ) {}
+  ) // private itemsService: ItemsService, // @InjectModel('item') private ItemModel: Model<IItem>,
+  {}
 
   async getUserCollections({
     userId,
@@ -136,5 +140,6 @@ export class CollectionsService {
 
   async deleteCollection(collectionId: Types.ObjectId) {
     await this.CollectionModel.deleteOne({ _id: collectionId });
+    // await this.itemsService.deleteItemsWithCollectionId(collectionId);
   }
 }

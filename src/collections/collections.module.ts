@@ -13,6 +13,6 @@ import { CollectionsService } from './collections.service';
   ],
   controllers: [CollectionsController],
   providers: [CollectionsService],
-  exports: [CollectionsService],
+  exports: [CollectionsService, MongooseModule],
 })
 export class CollectionsModule {}
