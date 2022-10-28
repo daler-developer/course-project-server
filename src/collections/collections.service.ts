@@ -9,13 +9,13 @@ import { UsersService } from 'src/users/users.service';
 import { ICollection } from './collection.schema';
 import { CreateCollectionDto } from './dto/create-collection.dto';
 import { EditCollectionDto } from './dto/edit-collection.dto';
+import { stringify } from 'csv-stringify/sync';
 
 @Injectable()
 export class CollectionsService {
   constructor(
-    @InjectModel('collection') private CollectionModel: Model<ICollection>,
-  ) // private itemsService: ItemsService, // @InjectModel('item') private ItemModel: Model<IItem>,
-  {}
+    @InjectModel('collection') private CollectionModel: Model<ICollection>, // private itemsService: ItemsService, // @InjectModel('item') private ItemModel: Model<IItem>,
+  ) {}
 
   async getUserCollections({
     userId,
@@ -37,6 +37,7 @@ export class CollectionsService {
   async getLargestCollections() {
     const collections = await this.CollectionModel.find()
       .sort('-numItems')
+      .populate('creator')
       .limit(5);
 
     return collections;
@@ -64,6 +65,14 @@ export class CollectionsService {
     });
 
     return collection;
+  }
+
+  async getCollectionCsv({ collectionId }: { collectionId: Types.ObjectId }) {
+    const collection = await this.CollectionModel.findOne({
+      _id: collectionId,
+    }).populate<{ items: IItem }>('items');
+
+    return stringify(collection.items as any, { delimiter: ';' });
   }
 
   async editCollection({

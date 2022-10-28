@@ -118,6 +118,15 @@ export class CollectionsController {
     return { collection };
   }
 
+  @Get('/collections/:_id/csv')
+  async getCSV(@Param('_id', ParseObjectIdPipe) collectionId: Types.ObjectId) {
+    const csv = await this.collectionsService.getCollectionCsv({
+      collectionId,
+    });
+
+    return { csv };
+  }
+
   @Get('/profile/collections')
   @UseGuards(AuthRequiredGuard)
   async getProfileCollections(

@@ -19,7 +19,7 @@ export class CatchAllExceptionFilter implements ExceptionFilter {
     if (exception instanceof RequestError) {
       return response
         .status(exception.status)
-        .json({ message: exception.message });
+        .json({ message: exception.message, errorType: exception.errorType });
     }
 
     return response.status(HttpStatus.BAD_REQUEST).json({

@@ -89,3 +89,8 @@ CollectionSchema.virtual('creator', {
   foreignField: '_id',
   justOne: true,
 });
+CollectionSchema.virtual('items', {
+  ref: 'item',
+  localField: '_id',
+  foreignField: 'collectionId',
+});

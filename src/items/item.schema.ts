@@ -84,6 +84,8 @@ export const ItemSchema = new mongoose.Schema<IItem>(
   },
 );
 
+ItemSchema.index({ name: 'text' });
+
 ItemSchema.virtual('creator', {
   ref: 'user',
   localField: 'creatorId',

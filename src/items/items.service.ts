@@ -54,30 +54,31 @@ export class ItemsService {
     tag?: string;
     search?: string;
   }) {
-    const $or = [];
-
     if (search) {
-      $or.push({
-        name: {
-          $regex: new RegExp(search, 'i'),
+      const items = await this.ItemModel.find({
+        $text: {
+          $search: search,
         },
-      });
+      })
+        .skip(offset)
+        .limit(10);
+
+      return items;
     }
 
     if (tag) {
-      $or.push({
+      const items = await this.ItemModel.find({
         tags: {
           $all: [tag],
         },
-      });
-    }
-    const items = await this.ItemModel.find({
-      $or,
-    })
-      .skip(offset)
-      .limit(10);
+      })
+        .skip(offset)
+        .limit(10);
 
-    return items;
+      return items;
+    }
+
+    return [] as IItem[];
   }
 
   async deleteItemsWithCollectionId(collectionId: Types.ObjectId) {
