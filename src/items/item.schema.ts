@@ -61,11 +61,6 @@ export const ItemSchema = new mongoose.Schema<IItem>(
       required: true,
       default: () => [],
     },
-    comments_ids: {
-      type: [mongoose.Schema.Types.ObjectId],
-      required: true,
-      default: () => [],
-    },
     tags: {
       type: [String],
       required: true,
@@ -84,7 +79,7 @@ export const ItemSchema = new mongoose.Schema<IItem>(
   },
 );
 
-ItemSchema.index({ name: 'text' });
+ItemSchema.index({ name: 'text', 'comments.text': 'text' });
 
 ItemSchema.virtual('creator', {
   ref: 'user',
@@ -97,4 +92,9 @@ ItemSchema.virtual('_collection', {
   localField: 'collectionId',
   foreignField: '_id',
   justOne: true,
+});
+ItemSchema.virtual('comments', {
+  ref: 'comment',
+  localField: '_id',
+  foreignField: 'itemId',
 });

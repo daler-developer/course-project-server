@@ -35,6 +35,8 @@ export const CommentSchema = new mongoose.Schema<IComment>(
   },
 );
 
+CommentSchema.index({ name: 'text' });
+
 CommentSchema.virtual('creator', {
   ref: 'user',
   localField: 'creatorId',
