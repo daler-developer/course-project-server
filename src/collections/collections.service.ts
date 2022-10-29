@@ -108,6 +108,8 @@ export class CollectionsService {
       collectionId,
     );
 
+    await this.itemsService.deleteItemsWithCollectionId(collectionId);
+
     return updatedCollection;
   }
 

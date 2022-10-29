@@ -1,5 +1,5 @@
 import { Body, Controller, Get, Patch, Post, UseGuards } from '@nestjs/common';
-import { UserAlreadyExistsError } from 'src/core/errors/auth';
+import { UserAlreadyExistsError, UserBlockedError } from 'src/core/errors/auth';
 import { AuthService } from './auth.service';
 import { CreateUserDto } from '../users/dto/create-user.dto';
 import { LoginBodyDto } from './dto/login-body.dto';
@@ -11,13 +11,46 @@ import { ChangeThemeDto } from './dto/change-theme.dto';
 import { User } from 'src/core/decorators/user.decorator';
 import { IUser } from 'src/users/user.schema';
 import { ChangeTLangDto } from './dto/change-lang.dto';
+import { HttpService } from '@nestjs/axios';
 
 @Controller('/api')
 export class AuthController {
   constructor(
     private authService: AuthService,
     private usersService: UsersService,
+    private httpService: HttpService,
   ) {}
+
+  @Post('/auth/github-oauth')
+  async loginWithGithub(@Body('code') code: string) {
+    const { data } = await this.httpService.axiosRef.post<{
+      access_token: string;
+    }>(
+      'https://github.com/login/oauth/access_token',
+      {
+        client_id: 'cb3cfd1b84fafe5edd71',
+        client_secret: '9630f47913d7eda64224ed8d700ca429488e5b17',
+        code,
+      },
+      {
+        headers: {
+          Accept: 'application/json',
+        },
+      },
+    );
+
+    const res = await this.httpService.axiosRef.get(
+      'https://api.github.com/user',
+      {
+        headers: {
+          Authorization: `Bearer ${data.access_token}`,
+          Accept: 'application/json',
+        },
+      },
+    );
+
+    return { user: res.data };
+  }
 
   @Post('/auth/register')
   async register(@Body(ValidationPipe) body: CreateUserDto) {
@@ -76,6 +109,10 @@ export class AuthController {
       user._id,
       body.password,
     );
+
+    if (user.isBlocked) {
+      throw new UserBlockedError();
+    }
 
     const accessToken = this.authService.generateAccessToken({
       userId: user._id,

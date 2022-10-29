@@ -29,3 +29,9 @@ export class AdminRequiredError extends RequestError {
     super('Admin required', 400, 'auth/admin_required');
   }
 }
+
+export class UserBlockedError extends RequestError {
+  constructor() {
+    super('User was blocked', 400, 'auth/user_blocked');
+  }
+}
