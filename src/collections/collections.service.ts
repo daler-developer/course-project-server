@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { CollectionNotFoundError } from 'src/core/errors/collections';
@@ -14,7 +14,9 @@ import { stringify } from 'csv-stringify/sync';
 @Injectable()
 export class CollectionsService {
   constructor(
-    @InjectModel('collection') private CollectionModel: Model<ICollection>, // private itemsService: ItemsService, // @InjectModel('item') private ItemModel: Model<IItem>,
+    @InjectModel('collection') private CollectionModel: Model<ICollection>,
+    @Inject(forwardRef(() => ItemsService))
+    private itemsService: ItemsService, // @InjectModel('item') private ItemModel: Model<IItem>,
   ) {}
 
   async getUserCollections({
@@ -124,8 +126,25 @@ export class CollectionsService {
     );
   }
 
+  async decrementNumItemsInCollection({
+    collectionId,
+  }: {
+    collectionId: Types.ObjectId;
+  }) {
+    await this.CollectionModel.updateOne(
+      { _id: collectionId },
+      {
+        $inc: {
+          numItems: -1,
+        },
+      },
+    );
+  }
+
   async getCollectionByIdOrFailIfNotFound(_id: Types.ObjectId) {
-    const collection = await this.CollectionModel.findById(_id);
+    const collection = await this.CollectionModel.findById(_id).populate(
+      'creator',
+    );
 
     if (!collection) {
       throw new CollectionNotFoundError();
@@ -149,6 +168,6 @@ export class CollectionsService {
 
   async deleteCollection(collectionId: Types.ObjectId) {
     await this.CollectionModel.deleteOne({ _id: collectionId });
-    // await this.itemsService.deleteItemsWithCollectionId(collectionId);
+    await this.itemsService.deleteItemsWithCollectionId(collectionId);
   }
 }

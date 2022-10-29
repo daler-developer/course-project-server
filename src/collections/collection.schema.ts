@@ -45,6 +45,7 @@ export const CollectionSchema = new mongoose.Schema<ICollection>(
       required: false,
     },
     fields: {
+      _id: false,
       type: {
         boolean: {
           type: [String],

@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { CollectionsService } from 'src/collections/collections.service';
@@ -17,6 +17,7 @@ import { IItem } from './item.schema';
 export class ItemsService {
   constructor(
     @InjectModel('item') private ItemModel: Model<IItem>,
+    @Inject(forwardRef(() => CollectionsService))
     private collectionsService: CollectionsService,
     private requestService: RequestService,
     private tagsService: TagsService,
@@ -113,7 +114,12 @@ export class ItemsService {
   }
 
   async deleteItem({ itemId }: { itemId: Types.ObjectId }) {
+    const itemToBeDeleted = await this.ItemModel.findById(itemId);
+
     await this.ItemModel.deleteOne({ _id: itemId });
+    await this.collectionsService.decrementNumItemsInCollection({
+      collectionId: itemToBeDeleted.collectionId,
+    });
   }
 
   async getItemByIdOrFailIfNotFound(_id: Types.ObjectId) {
