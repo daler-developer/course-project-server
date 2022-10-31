@@ -17,10 +17,16 @@ import { UsersService } from './users.service';
 import { UserByIdPipe } from 'src/core/pipes/user-by-id.pipe';
 import { IUser } from './user.schema';
 import { User } from 'src/core/decorators/user.decorator';
+import { CollectionsService } from 'src/collections/collections.service';
+import { ItemsService } from 'src/items/items.service';
 
 @Controller('/api')
 export class UsersController {
-  constructor(private usersService: UsersService) {}
+  constructor(
+    private usersService: UsersService,
+    private collectionsService: CollectionsService,
+    private itemsService: ItemsService,
+  ) {}
 
   @Get('/users/me')
   @UseGuards(AuthRequiredGuard)
@@ -62,6 +68,8 @@ export class UsersController {
   @UseGuards(AuthRequiredGuard, AdminRequiredGuard)
   async deleteUser(@Param('_id', UserByIdPipe) user: IUser) {
     await this.usersService.deleteUser(user._id);
+    // await this.collectionsService.deleteCollectionsWithCreatorId(user._id);
+    // await this.itemsService.deleteItemsWithCollectionId(user._id);
 
     return { deleted: true };
   }

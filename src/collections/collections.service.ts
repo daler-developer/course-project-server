@@ -173,7 +173,7 @@ export class CollectionsService {
     await this.itemsService.deleteItemsWithCollectionId(collectionId);
   }
 
-  async deleteCollectionsWithCreatorId(creatorId: Types.ObjectId[]) {
+  async deleteCollectionsWithCreatorId(creatorId: Types.ObjectId) {
     await this.CollectionModel.deleteMany({ creatorId });
   }
 }
