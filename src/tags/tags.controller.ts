@@ -5,8 +5,9 @@ import { TagsService } from './tags.service';
 export class TagsController {
   constructor(private tagsService: TagsService) {}
 
-  @Get('/tags')
+  @Get('/common/tags')
   async getTags() {
+    console.log('TAGS');
     const tags = await this.tagsService.getAllTags();
 
     return { tags };
