@@ -68,8 +68,8 @@ export class UsersController {
   @UseGuards(AuthRequiredGuard, AdminRequiredGuard)
   async deleteUser(@Param('_id', UserByIdPipe) user: IUser) {
     await this.usersService.deleteUser(user._id);
-    // await this.collectionsService.deleteCollectionsWithCreatorId(user._id);
-    // await this.itemsService.deleteItemsWithCollectionId(user._id);
+    await this.collectionsService.deleteCollectionsWithCreatorId(user._id);
+    await this.itemsService.deleteItemsWithCreatorId(user._id);
 
     return { deleted: true };
   }

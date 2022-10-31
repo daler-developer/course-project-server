@@ -1,4 +1,4 @@
-import { forwardRef, Inject, Injectable } from '@nestjs/common';
+import { forwardRef, Inject, Injectable, Type } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { CollectionsService } from 'src/collections/collections.service';
@@ -96,10 +96,15 @@ export class ItemsService {
     collectionId: Types.ObjectId;
     creatorId: Types.ObjectId;
   }) {
+    const collection =
+      await this.collectionsService.getCollectionByIdOrFailIfNotFound(
+        collectionId,
+      );
+
     const item = await this.ItemModel.create({
       fields,
       collectionId,
-      creatorId,
+      creatorId: collection.creatorId,
       name,
       tags,
     });
@@ -120,6 +125,10 @@ export class ItemsService {
     await this.collectionsService.decrementNumItemsInCollection({
       collectionId: itemToBeDeleted.collectionId,
     });
+  }
+
+  async deleteItemsWithCreatorId(creatorId: Types.ObjectId) {
+    await this.ItemModel.deleteMany({ creatorId });
   }
 
   async getItemByIdOrFailIfNotFound(_id: Types.ObjectId) {
