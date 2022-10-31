@@ -105,6 +105,7 @@ export class CollectionsController {
 
   @Get('/collections/largest')
   async getLargestCollections() {
+    console.log('COLLECTIONS');
     const collections = await this.collectionsService.getLargestCollections();
 
     return { collections };

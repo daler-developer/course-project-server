@@ -16,8 +16,8 @@ import { TagsModule } from './tags/tags.module';
     UsersModule,
     CollectionsModule,
     ItemsModule,
-    CommentsModule,
     TagsModule,
+    CommentsModule,
     MongooseModule.forRoot(
       'mongodb+srv://daler-developer:2000909k@cluster0.w93fir2.mongodb.net/?retryWrites=true&w=majority',
     ),
