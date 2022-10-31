@@ -172,4 +172,8 @@ export class CollectionsService {
     await this.CollectionModel.deleteOne({ _id: collectionId });
     await this.itemsService.deleteItemsWithCollectionId(collectionId);
   }
+
+  async deleteCollectionsWithCreatorId(creatorId: Types.ObjectId[]) {
+    await this.CollectionModel.deleteMany({ creatorId });
+  }
 }
